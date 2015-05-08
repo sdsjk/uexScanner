@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<uexplugins>
+      <plugin
+        className="org.zywx.wbpalmstar.plugin.uexzxing.EUExScanner" uexName="uexScanner" >
+        <method name="open" />
+        <method name="openthebarcode" />
+        <method name="createBarCode" />
+        <method name="twoDimensionCode" />
+        <method name="setJsonData"/>
+    </plugin>
+    
+</uexplugins>

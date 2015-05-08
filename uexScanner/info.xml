@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<uexplugins>
+    <plugin
+        uexName="uexScanner" version="3.0.9" build="9">
+		<info>9:优化UI效果</info>
+        <build>8:ZBar更新UI,增加setJsonData接口</build>
+		<build>7:修复uexScanner扫码画面颠倒问题</build>
+        <build>6:修复插件包打包错误问题</build>
+        <build>5:优化扫描界面</build>
+        <build>4:CreateBarCode不能调用问题</build>
+        <build>3:新增生成条形码和二维码接口</build>
+        <build>2:修复手动输入条形码崩溃问题</build>
+        <build>1:修复资源问题</build>
+        <build>0:条形码二维码扫描功能插件</build>
+    </plugin>
+</uexplugins>
