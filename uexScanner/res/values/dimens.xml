@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="plugin_uexscanner_tool_top">25dip</dimen>
+    <dimen name="plugin_uexscanner_tool_left">25dip</dimen>
+
+</resources>
