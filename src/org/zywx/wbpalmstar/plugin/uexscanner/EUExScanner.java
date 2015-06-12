@@ -144,7 +144,8 @@ public class EUExScanner extends EUExBase {
                         data.getStringExtra(EUExCallback.F_JK_CODE));
                 jobj.put(EUExCallback.F_JK_TYPE,
                         data.getStringExtra(EUExCallback.F_JK_TYPE));
-                jsCallback(JsConst.CALLBACK_OPEN, 0, EUExCallback.F_C_JSON, jobj.toString());
+                String result = jobj.toString();
+                jsCallback(JsConst.CALLBACK_OPEN, 0, EUExCallback.F_C_JSON, result);
             } catch (Exception e) {
                 e.printStackTrace();
             }

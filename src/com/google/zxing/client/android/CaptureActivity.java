@@ -18,12 +18,20 @@ package com.google.zxing.client.android;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Rect;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
+import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -31,22 +39,36 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.ace.zxing.BarcodeFormat;
+import com.ace.zxing.BinaryBitmap;
+import com.ace.zxing.DecodeHintType;
+import com.ace.zxing.MultiFormatReader;
 import com.ace.zxing.Result;
+import com.ace.zxing.ResultMetadataType;
 import com.google.zxing.client.android.camera.CameraManager;
 import com.google.zxing.client.android.result.ResultHandler;
 import com.google.zxing.client.android.result.ResultHandlerFactory;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.zywx.wbpalmstar.base.ACEImageLoader;
 import org.zywx.wbpalmstar.engine.universalex.EUExCallback;
 import org.zywx.wbpalmstar.engine.universalex.EUExUtil;
 import org.zywx.wbpalmstar.plugin.uexscanner.JsConst;
 import org.zywx.wbpalmstar.plugin.uexzxing.DataJsonVO;
+import org.zywx.wbpalmstar.plugin.uexzxing.ScannerUtils;
 import org.zywx.wbpalmstar.plugin.uexzxing.ViewToolView;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Vector;
 
 /**
  * This activity opens the camera and does the actual scanning on a background thread. It draws a
@@ -71,8 +93,12 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private RelativeLayout mConRel;
   private DataJsonVO mData;
   private ViewToolView mToolView;
+    private Rect rect;
+    private ImageView mGalleryPic;
+    private TextView mFailText;
+    private ScanPicHandler mHandler;
 
-  ViewfinderView getViewfinderView() {
+    ViewfinderView getViewfinderView() {
     return viewfinderView;
   }
 
@@ -106,10 +132,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     ambientLightManager = new AmbientLightManager(this);
     mConRel = (RelativeLayout) findViewById(EUExUtil.getResIdID("plugin_uexscanner_content_rel"));
     initConView();
+        mHandler = new ScanPicHandler(Looper.getMainLooper());
   }
 
   private void initConView(){
-    mToolView = new ViewToolView(this, mData);
+    mToolView = new ViewToolView(this, mData, toolListener);
     RelativeLayout.LayoutParams toolParams = new RelativeLayout.LayoutParams(
             LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
     int top = (int)getResources().getDimension(
@@ -117,6 +144,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     int left = (int)getResources().getDimension(
             EUExUtil.getResDimenID("plugin_uexscanner_tool_left"));
     toolParams.setMargins(left, top, left, 0);
+      mToolView.setId(1);
     mToolView.setLayoutParams(toolParams);
     mConRel.addView(mToolView);
 
@@ -126,12 +154,59 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     viewParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
     viewfinderView.setLayoutParams(viewParams);
     mConRel.addView(viewfinderView);
+
+      mGalleryPic = new ImageView(this);
+      RelativeLayout.LayoutParams picParams = new RelativeLayout.LayoutParams(
+              LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+      picParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+      picParams.addRule(RelativeLayout.BELOW, 1);
+      picParams.setMargins(left, top, left, top);
+      mGalleryPic.setLayoutParams(picParams);
+      mConRel.addView(mGalleryPic);
+
+      mGalleryPic.setVisibility(View.GONE);
+
+      mFailText = new TextView(this);
+      RelativeLayout.LayoutParams failTextParams = new RelativeLayout.LayoutParams(
+              LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+      failTextParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+      mFailText.setLayoutParams(failTextParams);
+      mFailText.setGravity(Gravity.CENTER);
+      mFailText.setTextColor(Color.WHITE);
+      mFailText.setTextSize(25);
+      mConRel.addView(mFailText);
+
+      mFailText.setVisibility(View.GONE);
+      mFailText.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+              mFailText.setVisibility(View.GONE);
+              mGalleryPic.setVisibility(View.GONE);
+          }
+      });
+
   }
+
+
+    public class ScanPicHandler extends Handler {
+
+        public ScanPicHandler(Looper loop) {
+            super(loop);
+        }
+
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case JsConst.DISPLAY_BARCODE_IMAGE:
+                    mGalleryPic.setVisibility(View.VISIBLE);
+                    mGalleryPic.setImageBitmap((Bitmap) msg.obj);
+                    break;
+            }
+        }
+    }
 
   @Override
   protected void onResume() {
     super.onResume();
-
     // CameraManager must be initialized here, not in onCreate(). This is necessary because we don't
     // want to open the camera driver and measure the screen size if we're going to show the help on
     // first launch. That led to bugs where the scanning rectangle was the wrong size and partially
@@ -140,7 +215,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     handler = null;
 
-    resetStatusView();
+    //resetStatusView();
 
     ambientLightManager.start(cameraManager);
 
@@ -174,6 +249,18 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
   }
 
+    ToolListener toolListener = new ToolListener() {
+        @Override
+        public void hideViewFinder() {
+            if (viewfinderView != null){
+                viewfinderView.setVisibility(View.GONE);
+            }
+        }
+    };
+    public interface ToolListener {
+        public void hideViewFinder();
+    }
+
   @Override
   protected void onPause() {
     if (handler != null) {
@@ -186,8 +273,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     //historyManager = null; // Keep for onActivityResult
     if (!hasSurface) {
       SurfaceView surfaceView = (SurfaceView) findViewById(EUExUtil.getResIdID("preview_view"));
-      SurfaceHolder surfaceHolder = surfaceView.getHolder();
-      surfaceHolder.removeCallback(this);
+        if (surfaceView != null){
+            SurfaceHolder surfaceHolder = surfaceView.getHolder();
+            surfaceHolder.removeCallback(this);
+        }
     }
     super.onPause();
   }
@@ -252,7 +341,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
    * @param barcode   A greyscale bitmap of the camera data which was decoded.
    */
   public void handleDecode(Result rawResult, Bitmap barcode, float scaleFactor) {
-    Log.i("djf-" + TAG,"handleDecode-result = " + rawResult.getText());
+    Log.i(TAG,"handleDecode-result = " + rawResult.getText());
     inactivityTimer.onActivity();
     ResultHandler resultHandler = ResultHandlerFactory.makeResultHandler(this, rawResult);
     switch (source) {
@@ -264,13 +353,27 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   // Briefly show the contents of the barcode, then handle the result outside Barcode Scanner.
   private void handleDecodeExternally(Result rawResult, ResultHandler resultHandler, Bitmap barcode) {
-    Log.i("djf-" + TAG,"handleDecodeExternally-result = " + rawResult.getText());
     if (source == IntentSource.NATIVE_APP_INTENT) {
       // Hand back whatever action they requested - this can be changed to Intents.Scan.ACTION when
       // the deprecated intent is retired.
       Intent intent = new Intent(getIntent().getAction());
       intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-      intent.putExtra(EUExCallback.F_JK_CODE, rawResult.toString());
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("code", rawResult.toString());
+            jsonObject.put("result", rawResult.getText());
+            jsonObject.put("type", rawResult.getBarcodeFormat());
+            Map<ResultMetadataType, Object> data = new Hashtable<ResultMetadataType, Object>();
+            Iterator iterator = data.keySet().iterator();
+            while (iterator.hasNext()){
+                final ResultMetadataType key = (ResultMetadataType) iterator.next();
+                jsonObject.put(key.toString(), data.get(key).toString());
+            }
+            jsonObject.put("timestamp", rawResult.getTimestamp());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        intent.putExtra(EUExCallback.F_JK_CODE, rawResult.toString());
       intent.putExtra(EUExCallback.F_JK_TYPE, rawResult.getBarcodeFormat()
               .toString());
       sendReplyMessage(EUExUtil.getResIdID("return_scan_result"), intent, 0);
@@ -297,7 +400,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       return;
     }
     try {
-      cameraManager.openDriver(surfaceHolder);
+        cameraManager.openDriver(surfaceHolder);
       // Creating the handler starts the preview, which can also throw a RuntimeException.
       if (handler == null) {
         handler = new CaptureActivityHandler(this, decodeFormats, null, characterSet, cameraManager);
@@ -311,6 +414,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       Log.w(TAG, "Unexpected error initializing camera", e);
       displayFrameworkBugMessageAndExit();
     }
+      rect = getCameraManager().getFramingRect();
   }
 
   private void displayFrameworkBugMessageAndExit() {
@@ -330,4 +434,94 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   public void drawViewfinder() {
     viewfinderView.drawViewfinder();
   }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mGalleryPic.setVisibility(View.GONE);
+        mGalleryPic.setImageBitmap(null);
+        mFailText.setVisibility(View.GONE);
+        mFailText.setText(null);
+        if (requestCode == JsConst.START_IMAGE_INTENT
+                && resultCode == RESULT_OK && null != data) {
+            ScanLocalImageAsyncTask task = new ScanLocalImageAsyncTask(data.getData());
+            task.execute();
+        }else {
+            resetStatusView();
+        }
+    }
+
+    private class ScanLocalImageAsyncTask extends AsyncTask<Object, Object, Integer>{
+
+        private Uri uri;
+        private ProgressDialog dialog;
+
+        public ScanLocalImageAsyncTask(Uri uri) {
+            this.uri = uri;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            dialog = ProgressDialog.show(CaptureActivity.this,
+                    EUExUtil.getString("prompt"),
+                    EUExUtil.getString("plugin_uexscanner_msg_scanning"));
+        }
+
+        @Override
+        protected void onPostExecute(Integer o) {
+            if (dialog != null){
+                dialog.dismiss();
+                dialog = null;
+            }
+            resetStatusView();
+            if (o == JsConst.SCAN_FAIL){
+                mFailText.setText(Html.fromHtml("图片扫描失败\n" +
+                        "<font color=\"#ff0000\">点击重试</font>"));
+                mFailText.setVisibility(View.VISIBLE);
+            }
+        }
+
+        @Override
+        protected Integer doInBackground(Object[] params) {
+            int width = Math.round(rect.right - rect.left);
+            Bitmap bitmap = ScannerUtils.formatBitmap(getApplicationContext(), width, uri);
+            Message msg = new Message();
+            msg.what = JsConst.DISPLAY_BARCODE_IMAGE;
+            msg.obj = bitmap;
+            mHandler.sendMessage(msg);
+            try {
+                BinaryBitmap barcode = ScannerUtils.loadImage(bitmap);
+                if(barcode != null) {
+                    MultiFormatReader multiFormatReader = new MultiFormatReader();
+
+                    Hashtable<DecodeHintType, Object> hints = new Hashtable<DecodeHintType, Object>(3);
+
+                    Vector<BarcodeFormat> decodeFormats = new Vector<BarcodeFormat>();
+
+                    //decodeFormats.addAll(DecodeFormatManager.ONE_D_FORMATS);      //支持解一维码
+                    decodeFormats.addAll(DecodeFormatManager.AZTEC_FORMATS);
+                    decodeFormats.addAll(DecodeFormatManager.PDF417_FORMATS);
+                    decodeFormats.addAll(DecodeFormatManager.INDUSTRIAL_FORMATS);
+                    decodeFormats.addAll(DecodeFormatManager.PRODUCT_FORMATS);
+                    decodeFormats.addAll(DecodeFormatManager.QR_CODE_FORMATS);    //支持解QR码
+                    decodeFormats.addAll(DecodeFormatManager.DATA_MATRIX_FORMATS);//支持解矩阵码
+
+                    hints.put(DecodeHintType.POSSIBLE_FORMATS, decodeFormats);
+
+                    if (characterSet != null) {
+                        hints.put(DecodeHintType.CHARACTER_SET, characterSet);
+                    }
+
+                    multiFormatReader.setHints(hints);
+                    Result rawResult = multiFormatReader.decodeWithState(barcode);
+                    if(rawResult != null) {
+                        handleDecode(rawResult, bitmap, 0f);
+                    }
+                }
+                return JsConst.SCAN_SUCCESS;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return JsConst.SCAN_FAIL;
+            }
+        }
+    }
 }

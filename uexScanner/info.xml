@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <uexplugins>
     <plugin
-        uexName="uexScanner" version="3.0.10" build="10">
-        <info>10:二维码优化</info>
+        uexName="uexScanner" version="3.0.11" build="11">
+        <info>11:添加扫描本地二维码图片功能</info>
+        <build>10:二维码优化</build>
         <build>9:优化UI效果</build>
         <build>8:ZBar更新UI,增加setJsonData接口</build>
         <build>7:修复uexScanner扫码画面颠倒问题</build>
