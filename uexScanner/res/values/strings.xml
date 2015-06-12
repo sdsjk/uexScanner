@@ -3,4 +3,5 @@
     <!-- plugin_uexScanner -->
     <string name="plugin_uexscanner_not_support_flash">设备不支持闪光灯</string>
     <string name="plugin_uexscanner_msg_default_status">将二维码/条形码放置框内，即开始扫描</string>
+    <string name="plugin_uexscanner_msg_scanning">正在扫描</string>
 </resources>

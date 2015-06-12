@@ -2,44 +2,53 @@ package org.zywx.wbpalmstar.plugin.uexzxing;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.client.android.camera.CameraManager;
 
 import org.zywx.wbpalmstar.engine.universalex.EUExUtil;
+import org.zywx.wbpalmstar.plugin.uexscanner.JsConst;
 
 public class ViewToolView extends RelativeLayout {
 
     private ImageButton mBtnCancel;
     private ImageView mBtnLight;
-    private TextView mTitle;
+    private ImageView mGallery;
     private Context mContext;
     private DataJsonVO mData;
+    private CaptureActivity.ToolListener mListener;
     
-    public ViewToolView(Context context, DataJsonVO data) {
+    public ViewToolView(Context context, DataJsonVO data, CaptureActivity.ToolListener listener) {
         super(context);
         this.mData = data;
         this.mContext = context;
+        this.mListener = listener;
         init();
     }
 
     @SuppressWarnings("deprecation")
     private void init(){
         setBackgroundResource(Color.TRANSPARENT);
-        mTitle = new TextView(mContext);
-        mTitle.setBackgroundDrawable(null);
-        mTitle.setTextColor(Color.WHITE);
-        mTitle.setText(mData.getTitle());
-        mTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+        mGallery = new ImageView(mContext);
+        mGallery.setClickable(true);
+        Drawable scan_gallery_on = mContext.getResources()
+                .getDrawable(EUExUtil.getResDrawableID("plugin_scanner_gallery_pressed"));
+        Drawable scan_gallery_off = mContext.getResources()
+                .getDrawable(EUExUtil.getResDrawableID("plugin_scanner_gallery_normal"));
+        StateListDrawable gallery_style = new StateListDrawable();
+        gallery_style.addState(new int[]{android.R.attr.state_pressed, android.R.attr.state_enabled}, scan_gallery_on);
+        gallery_style.addState(new int[]{android.R.attr.state_enabled, android.R.attr.state_focused}, scan_gallery_on);
+        gallery_style.addState(new int[]{android.R.attr.state_enabled}, scan_gallery_off);
+        mGallery.setBackgroundDrawable(gallery_style);
 
         mBtnLight = new ImageView(mContext);
         mBtnLight.setClickable(true);
@@ -68,25 +77,28 @@ public class ViewToolView extends RelativeLayout {
 
         LayoutParams parmh = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         parmh.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-        mTitle.setLayoutParams(parmh);
+        mBtnLight.setLayoutParams(parmh);
         
         LayoutParams parml = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         parml.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-        mBtnLight.setLayoutParams(parml);
+        mGallery.setLayoutParams(parml);
         
         LayoutParams parmc = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
         mBtnCancel.setLayoutParams(parmc);
 
         
-        addView(mTitle);
+        addView(mGallery);
         addView(mBtnLight);
         addView(mBtnCancel);
         
         mBtnCancel.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((Activity)getContext()).setResult(Activity.RESULT_CANCELED);
-                ((Activity)getContext()).finish();
+                if (mListener != null){
+                    mListener.hideViewFinder();
+                }
+                ((Activity) getContext()).setResult(Activity.RESULT_CANCELED);
+                ((Activity) getContext()).finish();
             }
         });
 
@@ -111,6 +123,17 @@ public class ViewToolView extends RelativeLayout {
                     mBtnLight.setBackgroundResource(
                             EUExUtil.getResDrawableID("plugin_scanner_light_pressed"));
                     on = true;
+                }
+            }
+        });
+        mGallery.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_PICK,
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                ((Activity)mContext).startActivityForResult(i, JsConst.START_IMAGE_INTENT);
+                if (mListener != null){
+                    mListener.hideViewFinder();
                 }
             }
         });

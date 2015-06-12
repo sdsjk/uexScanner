@@ -131,7 +131,6 @@ public final class CameraManager {
         }
       }
     }
-
   }
 
   public synchronized boolean isOpen() {
