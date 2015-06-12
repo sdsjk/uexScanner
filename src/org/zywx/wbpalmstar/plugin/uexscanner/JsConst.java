@@ -11,4 +11,5 @@ public class JsConst {
     public static final int DISPLAY_BARCODE_IMAGE = 10;
     public static final String DATA_PATH = "path";
     public static final int TOOL_ID = 111;
+    public static final int HANDLE_RESULT = 11;
 }

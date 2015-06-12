@@ -195,10 +195,16 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
         }
 
         public void handleMessage(Message msg) {
+            Log.i("djf", "handleMessage");
+            Bitmap bitmap = null;
             switch (msg.what){
                 case JsConst.DISPLAY_BARCODE_IMAGE:
+                    bitmap = (Bitmap) msg.obj;
                     mGalleryPic.setVisibility(View.VISIBLE);
-                    mGalleryPic.setImageBitmap((Bitmap) msg.obj);
+                    mGalleryPic.setImageBitmap(bitmap);
+                    break;
+                case JsConst.HANDLE_RESULT:
+                    handleDecode((Result) msg.obj, bitmap, 0f);
                     break;
             }
         }
@@ -207,6 +213,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   @Override
   protected void onResume() {
     super.onResume();
+      Log.i("djf", "onResume");
     // CameraManager must be initialized here, not in onCreate(). This is necessary because we don't
     // want to open the camera driver and measure the screen size if we're going to show the help on
     // first launch. That led to bugs where the scanning rectangle was the wrong size and partially
@@ -437,6 +444,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i("djf", "onActivityResult");
         mGalleryPic.setVisibility(View.GONE);
         mGalleryPic.setImageBitmap(null);
         mFailText.setVisibility(View.GONE);
@@ -514,7 +522,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
                     multiFormatReader.setHints(hints);
                     Result rawResult = multiFormatReader.decodeWithState(barcode);
                     if(rawResult != null) {
-                        handleDecode(rawResult, bitmap, 0f);
+                        Log.i("djf", "handleDecode");
+                        Message handleResult = new Message();
+                        handleResult.what = JsConst.HANDLE_RESULT;
+                        handleResult.obj = rawResult;
+                        mHandler.sendMessage(handleResult);
                     }
                 }
                 return JsConst.SCAN_SUCCESS;
