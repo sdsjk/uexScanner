@@ -3,6 +3,7 @@ package org.zywx.wbpalmstar.plugin.uexscanner;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Message;
@@ -99,6 +100,10 @@ public class EUExScanner extends EUExBase {
     }
 
     private void openMsg() {
+        if (!isCameraCanUse()){
+            jsCallback(JsConst.CALLBACK_OPEN, 1, EUExCallback.F_C_JSON, "");
+            return;
+        }
         Intent intent = new Intent();
         intent.setAction(Intents.Scan.ACTION);
         intent.putExtra(Intents.Scan.MODE, Intents.Scan.QR_CODE_MODE);
@@ -108,6 +113,22 @@ public class EUExScanner extends EUExBase {
         }
         startActivityForResult(intent, 55555);
         dataJson = null;
+    }
+
+    public static boolean isCameraCanUse() {
+        boolean canUse = true;
+        Camera mCamera = null;
+        try {
+            mCamera = Camera.open();
+        } catch (Exception e) {
+            canUse = false;
+        }
+        if (canUse) {
+            mCamera.release();
+            mCamera = null;
+        }
+
+        return canUse;
     }
 
     @Override

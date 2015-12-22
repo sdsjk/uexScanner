@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <uexplugins>
     <plugin
-        uexName="uexScanner" version="3.0.12" build="12">
-        <info>12:去掉读取联系人权限</info>
+        uexName="uexScanner" version="3.0.13" build="13">
+        <info>13:拍照权限被禁止情况处理</info>
+        <build>12:去掉读取联系人权限</build>
         <build>11:添加扫描本地二维码图片功能</build>
         <build>10:二维码优化</build>
         <build>9:优化UI效果</build>
