@@ -32,8 +32,8 @@ public class EUExScanner extends EUExBase {
     private String sdPath = "";
     private DataJsonVO dataJson;
 
-    public static boolean sHasChecked=false;
-    public static boolean sSupportCamera=false;
+    public boolean mHasChecked =false;
+    public boolean mSupportCamera =false;
 
     public EUExScanner(Context context, EBrowserView view) {
         super(context, view);
@@ -103,11 +103,11 @@ public class EUExScanner extends EUExBase {
     }
 
     private void openMsg() {
-        if (!sHasChecked){
-            sSupportCamera=isCameraCanUse();
-            sHasChecked=true;
+        if (!mHasChecked){
+            mSupportCamera =isCameraCanUse();
+            mHasChecked =true;
         }
-        if (!sSupportCamera){
+        if (!mSupportCamera){
             jsCallback(JsConst.CALLBACK_OPEN, 1, EUExCallback.F_C_JSON, "");
             return;
         }
