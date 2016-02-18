@@ -238,7 +238,7 @@ public final class CameraManager {
         return null;
       }
       int w = findDesiredDimensionInRange(screenResolution.x, MIN_FRAME_WIDTH, MAX_FRAME_WIDTH);;
-      int h = findDesiredDimensionInRange(screenResolution.y, MIN_FRAME_HEIGHT, MAX_FRAME_HEIGHT);
+      int h = w;
 
       viewWidth = w;
       viewHeight = h;
