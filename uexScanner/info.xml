@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <uexplugins>
     <plugin
-        uexName="uexScanner" version="3.0.14" build="14">
-        <info>14:调整扫描框为正方形</info>
+        uexName="uexScanner" version="3.0.15" build="15">
+        <info>15:添加charset字段设置编码</info>
+        <build>14:调整扫描框为正方形</build>
         <build>13:拍照权限被禁止情况处理</build>
         <build>12:去掉读取联系人权限</build>
         <build>11:添加扫描本地二维码图片功能</build>

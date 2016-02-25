@@ -9,6 +9,8 @@ public class DataJsonVO implements Serializable{
     private String tipLabel = null;//扫描区下部提示语
     private String title = null;//头部中间文字
 
+    private String charset;//解析字符编码
+
     public String getLineImg() {
         return lineImg;
     }
@@ -39,5 +41,13 @@ public class DataJsonVO implements Serializable{
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getCharset() {
+        return charset;
+    }
+
+    public void setCharset(String charset) {
+        this.charset = charset;
     }
 }

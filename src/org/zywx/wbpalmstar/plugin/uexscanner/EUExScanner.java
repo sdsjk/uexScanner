@@ -113,6 +113,9 @@ public class EUExScanner extends EUExBase {
         }
         Intent intent = new Intent();
         intent.setAction(Intents.Scan.ACTION);
+        if (dataJson!=null&&dataJson.getCharset()!=null){
+            intent.putExtra(Intents.Scan.CHARACTER_SET, dataJson.getCharset());
+        }
         intent.putExtra(Intents.Scan.MODE, Intents.Scan.QR_CODE_MODE);
         intent.setClass(mContext, CaptureActivity.class);
         if (dataJson != null){
