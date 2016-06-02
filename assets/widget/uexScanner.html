@@ -31,12 +31,13 @@
         alert(data);
     }
     
-    function  openWithData() {
+    function openWithData() {
         var data = {
             lineImg:"res://scanner_scanning.png",
             pickBgImg:"res://scan_scanbg.png",
-            tipLabel:"请耐心等待，一定会扫描成功的"
-        };
+            tipLabel:"请耐心等待，一定会扫描成功的",
+            isGallery:"0"
+        }; 
         uexScanner.setJsonData(JSON.stringify(data));
         uexScanner.open('ZXing');
     }

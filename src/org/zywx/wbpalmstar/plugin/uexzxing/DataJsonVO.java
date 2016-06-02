@@ -2,52 +2,65 @@ package org.zywx.wbpalmstar.plugin.uexzxing;
 
 import java.io.Serializable;
 
-public class DataJsonVO implements Serializable{
-    private static final long serialVersionUID = 8256431627503271706L;
-    private String lineImg = null;//扫描时移动的光线
-    private String pickBgImg = null;//扫描区域边框图片
-    private String tipLabel = null;//扫描区下部提示语
-    private String title = null;//头部中间文字
+public class DataJsonVO implements Serializable {
 
-    private String charset;//解析字符编码
+	private static final long serialVersionUID = 8256431627503271706L;
 
-    public String getLineImg() {
-        return lineImg;
-    }
+	private String lineImg = null;// 扫描时移动的光线
+	private String pickBgImg = null;// 扫描区域边框图片
+	private String tipLabel = null;// 扫描区下部提示语
+	private String title = null;// 头部中间文字
 
-    public void setLineImg(String lineImg) {
-        this.lineImg = lineImg;
-    }
+	private String charset;// 解析字符编码
 
-    public String getPickBgImg() {
-        return pickBgImg;
-    }
+	private String isGallery;// 是否支持从相册打开
 
-    public void setPickBgImg(String pickBgImg) {
-        this.pickBgImg = pickBgImg;
-    }
+	public String getLineImg() {
+		return lineImg;
+	}
 
-    public String getTipLabel() {
-        return tipLabel;
-    }
+	public void setLineImg(String lineImg) {
+		this.lineImg = lineImg;
+	}
 
-    public void setTipLabel(String tipLabel) {
-        this.tipLabel = tipLabel;
-    }
+	public String getPickBgImg() {
+		return pickBgImg;
+	}
 
-    public String getTitle() {
-        return title;
-    }
+	public void setPickBgImg(String pickBgImg) {
+		this.pickBgImg = pickBgImg;
+	}
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+	public String getTipLabel() {
+		return tipLabel;
+	}
 
-    public String getCharset() {
-        return charset;
-    }
+	public void setTipLabel(String tipLabel) {
+		this.tipLabel = tipLabel;
+	}
 
-    public void setCharset(String charset) {
-        this.charset = charset;
-    }
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getCharset() {
+		return charset;
+	}
+
+	public void setCharset(String charset) {
+		this.charset = charset;
+	}
+
+	public String getIsGallery() {
+		return isGallery;
+	}
+
+	public void setIsGallery(String isGallery) {
+		this.isGallery = isGallery;
+	}
+
 }
