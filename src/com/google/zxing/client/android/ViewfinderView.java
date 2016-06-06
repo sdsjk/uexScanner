@@ -36,6 +36,7 @@ import com.google.zxing.client.android.camera.CameraManager;
 
 import org.zywx.wbpalmstar.base.BUtility;
 import org.zywx.wbpalmstar.engine.universalex.EUExUtil;
+import org.zywx.wbpalmstar.plugin.uexscanner.utils.MLog;
 import org.zywx.wbpalmstar.plugin.uexzxing.DataJsonVO;
 
 import java.util.Collection;
@@ -225,6 +226,11 @@ public final class ViewfinderView extends View {
 	}
 
 	public static Bitmap drawableToBitmap(int w, int h, Drawable drawable) {
+		MLog.getIns().i("w = " + w + " h = " + h);
+		if (h <= 0) {// 当h小于等于0时,createBitmap会抛出IllegalArgumentException: width
+						// and height must be > 0
+			h = 5;// 所以当h小于等于0时，强制把h变为0以上
+		}
 		Bitmap bitmap = Bitmap.createBitmap(w, h, drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
 		Canvas canvas = new Canvas(bitmap);
 		drawable.setBounds(0, 0, w, h);

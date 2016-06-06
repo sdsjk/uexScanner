@@ -1,29 +1,29 @@
 <!DOCTYPE HTML>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        
-        <meta name="viewport"
-        content="target-densitydpi=device-dpi, width=device-width, initial-scale=1.0, user-scalable=no" />
-        <link rel="stylesheet" type="text/css" href="css/index.css">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-    <link rel="stylesheet" href="css/ui-base.css">
-    <link rel="stylesheet" href="css/ui-box.css">
-    <link rel="stylesheet" href="css/ui-color.css">
-    <link rel="stylesheet" href="css/ui-res.css">
-    <link rel="stylesheet" href="css/ui-btn.css">
-    <link rel="stylesheet" href="css/index.css">
-    <style>
-        input[type="text"]{
-            margin:.8em;
-            font-size:1em;
-        }
-    </style>
-    <script src="js/zy_control.js">
+<meta name="viewport"
+	content="target-densitydpi=device-dpi, width=device-width, initial-scale=1.0, user-scalable=no" />
+<link rel="stylesheet" type="text/css" href="css/index.css">
+
+<link rel="stylesheet" href="css/ui-base.css">
+<link rel="stylesheet" href="css/ui-box.css">
+<link rel="stylesheet" href="css/ui-color.css">
+<link rel="stylesheet" href="css/ui-res.css">
+<link rel="stylesheet" href="css/ui-btn.css">
+<link rel="stylesheet" href="css/index.css">
+<style>
+input[type="text"] {
+	margin: .8em;
+	font-size: 1em;
+}
+</style>
+<script src="js/zy_control.js">
     </script>
-    <script src="js/zy_click.js">
+<script src="js/zy_click.js">
     </script>
-    <script type="text/javascript">
+<script type="text/javascript">
     function ScannerSuccessCallBack(opCode, dataType, data) {
         alert("opCode:"+opCode+" data: "+data);
     }
@@ -32,13 +32,20 @@
     }
     
     function openWithData() {
-        var data = {
-            lineImg:"res://scanner_scanning.png",
-            pickBgImg:"res://scan_scanbg.png",
-            tipLabel:"请耐心等待，一定会扫描成功的",
-            isGallery:"0"
-        }; 
-        uexScanner.setJsonData(JSON.stringify(data));
+        //var data = {
+        //    lineImg:"res://scanner_scanning.png",
+        //    pickBgImg:"res://scan_scanbg.png",
+        //    tipLabel:"请耐心等待，一定会扫描成功的",
+        //    isGallery:"0"
+        //}; 
+        //uexScanner.setJsonData(JSON.stringify(data));
+      	var jsonData = { 
+             "lineImg":"res://line.png",
+             "pickBgImg":"res://pick_bg.png",
+             "tipLabel":"对准二维码/条形码,即可自动扫描",
+             "charset":"gbk"
+             };
+        uexScanner.setJsonData(JSON.stringify(jsonData));
         uexScanner.open('ZXing');
     }
     
@@ -47,16 +54,16 @@
         uexWidgetOne.cbError = ScannerFailedCallBack;
     }
         </script>
-  </head>
+</head>
 <body class="um-vp " ontouchstart>
-    <div class="conbor">
-            <div class="consj">
-                <span>1.打开二维码扫描</span>
-                <input class="btn" type="button" value="打开二维码扫描" onclick="uexScanner.open('ZXing');">
-                <input class="btn" type="button" value="setJsonData" onclick=openWithData()>
-            </div>
-            <br>
-        </div>
+	<div class="conbor">
+		<div class="consj">
+			<span>1.打开二维码扫描</span> <input class="btn" type="button"
+				value="打开二维码扫描" onclick="uexScanner.open('ZXing');"> <input
+				class="btn" type="button" value="setJsonData" onclick=openWithData()>
+		</div>
+		<br>
+	</div>
 </body>
 <script>
 

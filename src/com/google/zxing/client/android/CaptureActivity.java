@@ -58,6 +58,7 @@ import org.json.JSONObject;
 import org.zywx.wbpalmstar.engine.universalex.EUExCallback;
 import org.zywx.wbpalmstar.engine.universalex.EUExUtil;
 import org.zywx.wbpalmstar.plugin.uexscanner.JsConst;
+import org.zywx.wbpalmstar.plugin.uexscanner.utils.MLog;
 import org.zywx.wbpalmstar.plugin.uexzxing.DataJsonVO;
 import org.zywx.wbpalmstar.plugin.uexzxing.ScannerUtils;
 import org.zywx.wbpalmstar.plugin.uexzxing.ViewToolView;
