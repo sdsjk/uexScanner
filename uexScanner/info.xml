@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <uexplugins>
     <plugin
-        uexName="uexScanner" version="3.0.17" build="17">
-        <info>17:修复了当扫描线高度过小时，获取View的高度小于等于0造成的程序崩溃问题</info>
+        uexName="uexScanner" version="4.0.0" build="18">
+        <info>18:支持function传入</info>
+        <build>17:修复了当扫描线高度过小时，获取View的高度小于等于0造成的程序崩溃问题</build>
         <build>16:添加是否显示从相册选择按钮配置开关</build>
         <build>15:添加charset字段设置编码</build>
         <build>14:调整扫描框为正方形</build>
