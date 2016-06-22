@@ -96,10 +96,8 @@ public class EUExScanner extends EUExBase {
 	}
 
 	private void openMsg() {
-		if (!mHasChecked) {
-			mSupportCamera = isCameraCanUse();
-			mHasChecked = true;
-		}
+		mSupportCamera = isCameraCanUse();
+
 		if (!mSupportCamera) {
 			jsCallback(JsConst.CALLBACK_OPEN, 1, EUExCallback.F_C_JSON, "");
 			return;
@@ -123,6 +121,8 @@ public class EUExScanner extends EUExBase {
 		Camera mCamera = null;
 		try {
 			mCamera = Camera.open();
+            Camera.Parameters mParameters = mCamera.getParameters();
+            mCamera.setParameters(mParameters);//这里是对于魅族MX5等手机在不授权时会挂掉的处理的
 		} catch (Exception e) {
 			canUse = false;
 		}

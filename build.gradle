@@ -34,3 +34,5 @@ android {
         release.setRoot('build-types/release')
     }
 }
+
+apply from: "https://raw.githubusercontent.com/android-plugin/gradle-plugin/master/buildPlugin.gradle"
