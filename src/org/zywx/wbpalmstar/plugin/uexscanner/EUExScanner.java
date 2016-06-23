@@ -74,20 +74,13 @@ public class EUExScanner extends EUExBase {
         if (params != null && params.length ==1) {
             openFuncId = params[0];
         }
-
         mSupportCamera = isCameraCanUse();
 
         if (!mSupportCamera) {
-            jsCallback(JsConst.CALLBACK_OPEN, 1, EUExCallback.F_C_JSON, "");
-            try {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("code", 1);
-                jsonObject.put("msg", "camera not support");
-                if (null != openFuncId) {
-                    callbackToJs(Integer.parseInt(openFuncId), false, jsonObject);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (null != openFuncId) {
+                callbackToJs(Integer.parseInt(openFuncId), false);
+            } else {
+                jsCallback(JsConst.CALLBACK_OPEN, 1, EUExCallback.F_C_JSON, "");
             }
             return;
         }
