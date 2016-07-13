@@ -16,6 +16,17 @@
 
 package com.google.zxing.client.android;
 
+import java.util.Collection;
+import java.util.HashSet;
+
+import org.zywx.wbpalmstar.base.BUtility;
+import org.zywx.wbpalmstar.engine.universalex.EUExUtil;
+import org.zywx.wbpalmstar.plugin.uexscanner.utils.MLog;
+import org.zywx.wbpalmstar.plugin.uexzxing.DataJsonVO;
+
+import com.ace.zxing.ResultPoint;
+import com.google.zxing.client.android.camera.CameraManager;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
@@ -30,17 +41,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.View;
-
-import com.ace.zxing.ResultPoint;
-import com.google.zxing.client.android.camera.CameraManager;
-
-import org.zywx.wbpalmstar.base.BUtility;
-import org.zywx.wbpalmstar.engine.universalex.EUExUtil;
-import org.zywx.wbpalmstar.plugin.uexscanner.utils.MLog;
-import org.zywx.wbpalmstar.plugin.uexzxing.DataJsonVO;
-
-import java.util.Collection;
-import java.util.HashSet;
 
 /**
  * This view is overlaid on top of the camera preview. It adds the viewfinder
@@ -167,7 +167,11 @@ public final class ViewfinderView extends View {
 				slideTop = frame.top;
 			}
 			Drawable scanD = getLineImg();
-			int scanH = (int) (w * scanD.getIntrinsicHeight() / scanD.getIntrinsicWidth());
+			int intrinsicWidth = scanD.getIntrinsicWidth();
+            if (0 == intrinsicWidth) {
+                intrinsicWidth = 5;
+            }
+            int scanH = (int) (w * scanD.getIntrinsicHeight() / intrinsicWidth);
 			Bitmap scanBm = drawableToBitmap(w, scanH, scanD);
 			canvas.drawBitmap(scanBm, frame.left, slideTop - MIDDLE_LINE_WIDTH / 2, paint);
 
