@@ -78,7 +78,7 @@ public class EUExScanner extends EUExBase {
 
         if (!mSupportCamera) {
             if (null != openFuncId) {
-                callbackToJs(Integer.parseInt(openFuncId), false);
+                callbackToJs(Integer.parseInt(openFuncId), false, EUExCallback.F_C_FAILED);
             } else {
                 jsCallback(JsConst.CALLBACK_OPEN, 1, EUExCallback.F_C_JSON, "");
             }
@@ -134,9 +134,10 @@ public class EUExScanner extends EUExBase {
                 jobj.put(EUExCallback.F_JK_CODE, data.getStringExtra(EUExCallback.F_JK_CODE));
                 jobj.put(EUExCallback.F_JK_TYPE, data.getStringExtra(EUExCallback.F_JK_TYPE));
                 String result = jobj.toString();
-                jsCallback(JsConst.CALLBACK_OPEN, 0, EUExCallback.F_C_JSON, result);
                 if (null != openFuncId) {
-                    callbackToJs(Integer.parseInt(openFuncId), false, jobj);
+                    callbackToJs(Integer.parseInt(openFuncId), false, EUExCallback.F_C_SUCCESS, jobj);
+                } else {
+                    jsCallback(JsConst.CALLBACK_OPEN, 0, EUExCallback.F_C_JSON, result);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
