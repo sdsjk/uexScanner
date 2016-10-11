@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <uexplugins>
     <plugin
-        uexName="uexScanner" version="4.0.0" build="0">
-        <info>0:条形码二维码扫描功能插件</info>
+        uexName="uexScanner" version="4.0.1" build="1">
+        <info>1:优化扫描速度，解决图像变形问题</info>
+        <build>0:条形码二维码扫描功能插件</build>
     </plugin>
 </uexplugins>

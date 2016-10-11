@@ -49,17 +49,42 @@ final class CameraConfigurationManager {
 	 * Reads, one time, values from the camera that are needed by the app.
 	 */
 	void initFromCameraParameters(Camera camera) {
-		Camera.Parameters parameters = camera.getParameters();
-		WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-		Display display = manager.getDefaultDisplay();
-		Point theScreenResolution = new Point();
-		display.getSize(theScreenResolution);
-		screenResolution = theScreenResolution;
-		Log.i(TAG, "Screen resolution: " + screenResolution);
-		cameraResolution = CameraConfigurationUtils.findBestPreviewSizeValue(parameters, screenResolution);
-		Log.i(TAG, "Camera resolution: " + cameraResolution);
+        Camera.Parameters parameters = camera.getParameters();
+        WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = manager.getDefaultDisplay();
+        Point theScreenResolution = new Point();
+        theScreenResolution = getDisplaySize(display);
+
+        screenResolution = theScreenResolution;
+        Log.i(TAG, "Screen resolution: " + screenResolution);
+
+        /** 因为换成了竖屏显示，所以不替换屏幕宽高得出的预览图是变形的 */
+        Point screenResolutionForCamera = new Point();
+        screenResolutionForCamera.x = screenResolution.x;
+        screenResolutionForCamera.y = screenResolution.y;
+
+        if (screenResolution.x < screenResolution.y) {
+            screenResolutionForCamera.x = screenResolution.y;
+            screenResolutionForCamera.y = screenResolution.x;
+        }
+
+        cameraResolution = CameraConfigurationUtils.findBestPreviewSizeValue(parameters, screenResolutionForCamera);
+        Log.i(TAG, "Camera resolution x: " + cameraResolution.x);
+        Log.i(TAG, "Camera resolution y: " + cameraResolution.y);
 	}
 
+    @SuppressWarnings("deprecation")
+    @SuppressLint("NewApi")
+    private Point getDisplaySize(final Display display) {
+        final Point point = new Point();
+        try {
+            display.getSize(point);
+        } catch (NoSuchMethodError ignore) {
+            point.x = display.getWidth();
+            point.y = display.getHeight();
+        }
+        return point;
+    }
 	void setDesiredCameraParameters(Camera camera, boolean safeMode) {
 		Camera.Parameters parameters = camera.getParameters();
 
