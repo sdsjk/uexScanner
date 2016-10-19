@@ -3,11 +3,25 @@ package org.zywx.wbpalmstar.plugin.uexscanner;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.ace.universalimageloader.cache.memory.impl.LRULimitedMemoryCache;
+import com.ace.universalimageloader.core.ImageLoader;
+import com.ace.universalimageloader.core.ImageLoaderConfiguration;
+import com.ace.universalimageloader.core.assist.QueueProcessingType;
+import com.ace.universalimageloader.core.download.BaseImageDownloader;
+import com.ace.zxing.BarcodeFormat;
+import com.ace.zxing.BinaryBitmap;
+import com.ace.zxing.DecodeHintType;
+import com.ace.zxing.MultiFormatReader;
+import com.ace.zxing.NotFoundException;
+import com.ace.zxing.Result;
 import com.google.zxing.client.android.CaptureActivity;
+import com.google.zxing.client.android.DecodeFormatManager;
 import com.google.zxing.client.android.Intents;
 
 import org.json.JSONObject;
@@ -17,9 +31,13 @@ import org.zywx.wbpalmstar.engine.EBrowserView;
 import org.zywx.wbpalmstar.engine.universalex.EUExBase;
 import org.zywx.wbpalmstar.engine.universalex.EUExCallback;
 import org.zywx.wbpalmstar.plugin.uexzxing.DataJsonVO;
+import org.zywx.wbpalmstar.plugin.uexzxing.ScannerUtils;
 import org.zywx.wbpalmstar.widgetone.dataservice.WWidgetData;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Vector;
 
 public class EUExScanner extends EUExBase {
 
@@ -98,6 +116,74 @@ public class EUExScanner extends EUExBase {
         dataJson = null;
 
     }
+    public String recognizeFromImage(String params[]) {
+        final String str = params[0];
+        if (TextUtils.isEmpty(str)) {
+            return null;
+        }
+
+        Bitmap picBitmap = getPicBitmap(str);
+        String result = recognizeFromBitmap(picBitmap);
+        return result;
+    }
+
+    private Bitmap getPicBitmap(String path) {
+        if (path.startsWith("http")) {
+            ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(mContext);
+            config.threadPriority(Thread.NORM_PRIORITY);
+            config.denyCacheImageMultipleSizesInMemory();
+            config.memoryCacheExtraOptions(480, 800);
+            config.memoryCache(new LRULimitedMemoryCache(8 * 1024 * 1024));
+            config.tasksProcessingOrder(QueueProcessingType.LIFO);
+            //修改连接超时时间5秒，下载超时时间20秒
+            config.imageDownloader(new BaseImageDownloader(mContext, 5 * 1000, 20 * 1000));
+            ImageLoader.getInstance().init(config.build());
+            return ImageLoader.getInstance().loadImageSync(path);
+        } else {
+            return BUtility.getLocalImg(mContext, path);
+        }
+    }
+
+    private String recognizeFromBitmap(Bitmap picBitmap) {
+        BinaryBitmap barcode = null;
+        try {
+            barcode = ScannerUtils.loadImage(picBitmap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (barcode != null) {
+            MultiFormatReader multiFormatReader = new MultiFormatReader();
+
+            Hashtable<DecodeHintType, Object> hints = new Hashtable<DecodeHintType, Object>(3);
+
+            Vector<BarcodeFormat> decodeFormats = new Vector<BarcodeFormat>();
+
+            // decodeFormats.addAll(DecodeFormatManager.ONE_D_FORMATS);
+            // //支持解一维码
+            decodeFormats.addAll(DecodeFormatManager.AZTEC_FORMATS);
+            decodeFormats.addAll(DecodeFormatManager.PDF417_FORMATS);
+            decodeFormats.addAll(DecodeFormatManager.INDUSTRIAL_FORMATS);
+            decodeFormats.addAll(DecodeFormatManager.PRODUCT_FORMATS);
+            decodeFormats.addAll(DecodeFormatManager.QR_CODE_FORMATS); // 支持解QR码
+            decodeFormats.addAll(DecodeFormatManager.DATA_MATRIX_FORMATS);// 支持解矩阵码
+
+            hints.put(DecodeHintType.POSSIBLE_FORMATS, decodeFormats);
+
+
+            multiFormatReader.setHints(hints);
+            Result rawResult = null;
+            try {
+                rawResult = multiFormatReader.decodeWithState(barcode);
+            } catch (NotFoundException e) {
+                e.printStackTrace();
+            }
+            if (rawResult != null) {
+                return rawResult.toString();
+            }
+        }
+        return null;
+    }
+
 
 
 

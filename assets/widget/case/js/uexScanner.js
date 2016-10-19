@@ -9,8 +9,16 @@ if (UNIT_TEST) {
                      };
                      uexScanner.setJsonData(jsonData);
                       UNIT_TEST.assert(true);
-
                 },
+        "recognize": function() {
+            var result = uexScanner.recognizeFromImage("res://test.png")
+            if (result) {
+                UNIT_TEST.assert(true);
+                UNIT_TEST.log('[data]:' + result);
+            } else {
+                UNIT_TEST.assert(false);
+            }
+         },
         "open": function(){
             uexScanner.open(function(error, data) {
                 if (!error) {

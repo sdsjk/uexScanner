@@ -4,5 +4,6 @@
         className="org.zywx.wbpalmstar.plugin.uexscanner.EUExScanner" uexName="uexScanner" >
         <method name="open"/>
         <method name="setJsonData"/>
+        <method name="recognizeFromImage"/>
     </plugin>
 </uexplugins>
