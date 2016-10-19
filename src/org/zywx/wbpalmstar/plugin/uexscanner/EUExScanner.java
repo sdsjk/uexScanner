@@ -145,7 +145,7 @@ public class EUExScanner extends EUExBase {
         return result;
     }
 
-    public Bitmap getPicBitmap(String path) {
+    private Bitmap getPicBitmap(String path) {
         if (path.startsWith("http")) {
             ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(mContext);
             config.threadPriority(Thread.NORM_PRIORITY);
@@ -162,7 +162,7 @@ public class EUExScanner extends EUExBase {
         }
     }
 
-    public String recognizeFromBitmap(Bitmap picBitmap) {
+    private String recognizeFromBitmap(Bitmap picBitmap) {
         BinaryBitmap barcode = null;
         try {
             barcode = ScannerUtils.loadImage(picBitmap);
