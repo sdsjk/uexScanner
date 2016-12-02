@@ -16,17 +16,6 @@
 
 package com.google.zxing.client.android;
 
-import java.util.Collection;
-import java.util.HashSet;
-
-import org.zywx.wbpalmstar.base.BUtility;
-import org.zywx.wbpalmstar.engine.universalex.EUExUtil;
-import org.zywx.wbpalmstar.plugin.uexscanner.utils.MLog;
-import org.zywx.wbpalmstar.plugin.uexzxing.DataJsonVO;
-
-import com.ace.zxing.ResultPoint;
-import com.google.zxing.client.android.camera.CameraManager;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
@@ -41,6 +30,16 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.View;
+
+import com.ace.zxing.ResultPoint;
+import com.google.zxing.client.android.camera.CameraManager;
+
+import org.zywx.wbpalmstar.base.BUtility;
+import org.zywx.wbpalmstar.engine.universalex.EUExUtil;
+import org.zywx.wbpalmstar.plugin.uexzxing.DataJsonVO;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * This view is overlaid on top of the camera preview. It adds the viewfinder
@@ -230,7 +229,6 @@ public final class ViewfinderView extends View {
 	}
 
 	public static Bitmap drawableToBitmap(int w, int h, Drawable drawable) {
-		MLog.getIns().i("w = " + w + " h = " + h);
 		if (h <= 0) {// 当h小于等于0时,createBitmap会抛出IllegalArgumentException: width
 						// and height must be > 0
 			h = 5;// 所以当h小于等于0时，强制把h变为0以上

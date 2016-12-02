@@ -1,8 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <uexplugins>
     <plugin
-        uexName="uexScanner" version="3.0.20" build="2006071201">
-        <info>20:修复初始化相机抛出异常，导致应用崩溃的问题。</info>
+        uexName="uexScanner" version="3.0.22" build="22">
+        <info>22:新增图像识别接口</info>
+        <build>21:优化扫描速度，解决图像变形问题</build>
+        <build>20:修复初始化相机抛出异常，导致应用崩溃的问题。</build>
         <build>19:修复了某些手机上（小米note）上扫描线drawable固定宽度为0导致的应用程序崩溃</build>
         <build>18:修复了在魅族MX5等手机在不允许camera权限时会挂掉的问题</build>
         <build>17:修复了当扫描线高度过小时，获取View的高度小于等于0造成的程序崩溃问题</build>
