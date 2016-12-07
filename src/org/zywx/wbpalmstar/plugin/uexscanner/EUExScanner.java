@@ -5,9 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
-import android.os.Bundle;
 import android.os.Environment;
-import android.os.Message;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -50,8 +48,8 @@ public class EUExScanner extends EUExBase {
     private String sdPath = "";
     private DataJsonVO dataJson;
 
-    public boolean mHasChecked = false;
     public boolean mSupportCamera = false;
+    private String openFuncId;
 
     public EUExScanner(Context context, EBrowserView view) {
         super(context, view);
@@ -62,10 +60,8 @@ public class EUExScanner extends EUExBase {
             sdPath = widgetData.getWidgetPath() + "scanner" + File.separator;
             File file = new File(sdPath);
             if (!file.exists()) {
-                // 创建目录
                 file.mkdirs();
             }
-            // Toast.makeText(mContext, sdPath, Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(mContext, "sd卡不存在，请查看", Toast.LENGTH_SHORT).show();
         }
@@ -76,21 +72,7 @@ public class EUExScanner extends EUExBase {
         return false;
     }
 
-    public void setJsonData(String[] params) {
-        if (params == null || params.length < 1) {
-            errorCallback(0, 0, "error params!");
-            return;
-        }
-        Message msg = new Message();
-        msg.obj = this;
-        msg.what = MSG_SET_JSON_DATA;
-        Bundle bd = new Bundle();
-        bd.putStringArray(BUNDLE_DATA, params);
-        msg.setData(bd);
-        mHandler.sendMessage(msg);
-    }
-
-    private void setJsonDataMsg(String[] params) {
+    public boolean setJsonData(String[] params) {
         String json = params[0];
         dataJson = DataHelper.gson.fromJson(json, DataJsonVO.class);
         if (dataJson.getLineImg() != null) {
@@ -103,21 +85,21 @@ public class EUExScanner extends EUExBase {
                     mBrwView.getCurrentWidget().m_wgtType);
             dataJson.setPickBgImg(pickImg);
         }
-
+        return true;
     }
 
     public void open(String[] params) {
-        Message msg = new Message();
-        msg.obj = this;
-        msg.what = MSG_OPEN;
-        mHandler.sendMessage(msg);
-    }
-
-    private void openMsg() {
+        if (params != null && params.length ==1) {
+            openFuncId = params[0];
+        }
         mSupportCamera = isCameraCanUse();
 
         if (!mSupportCamera) {
-            jsCallback(JsConst.CALLBACK_OPEN, 1, EUExCallback.F_C_JSON, "");
+            if (null != openFuncId) {
+                callbackToJs(Integer.parseInt(openFuncId), false, EUExCallback.F_C_FAILED);
+            } else {
+                jsCallback(JsConst.CALLBACK_OPEN, 1, EUExCallback.F_C_JSON, "");
+            }
             return;
         }
         Intent intent = new Intent();
@@ -132,8 +114,8 @@ public class EUExScanner extends EUExBase {
         }
         startActivityForResult(intent, 55555);
         dataJson = null;
-    }
 
+    }
     public String recognizeFromImage(String params[]) {
         final String str = params[0];
         if (TextUtils.isEmpty(str)) {
@@ -203,6 +185,8 @@ public class EUExScanner extends EUExBase {
     }
 
 
+
+
     public static boolean isCameraCanUse() {
         boolean canUse = true;
         Camera mCamera = null;
@@ -221,24 +205,8 @@ public class EUExScanner extends EUExBase {
         return canUse;
     }
 
-    @Override
-    public void onHandleMessage(Message message) {
-        if (message == null) {
-            return;
-        }
-        Bundle bundle = message.getData();
-        switch (message.what) {
-            case MSG_SET_JSON_DATA:
-                setJsonDataMsg(bundle.getStringArray(BUNDLE_DATA));
-                break;
-            case MSG_OPEN:
-                openMsg();
-                break;
-            default:
-                super.onHandleMessage(message);
-        }
-    }
 
+    @SuppressWarnings("unused")
     private void callBackPluginJs(String methodName, String jsonData) {
         String js = SCRIPT_HEADER + "if(" + methodName + "){" + methodName + "('" + jsonData + "');}";
         onCallback(js);
@@ -252,7 +220,11 @@ public class EUExScanner extends EUExBase {
                 jobj.put(EUExCallback.F_JK_CODE, data.getStringExtra(EUExCallback.F_JK_CODE));
                 jobj.put(EUExCallback.F_JK_TYPE, data.getStringExtra(EUExCallback.F_JK_TYPE));
                 String result = jobj.toString();
-                jsCallback(JsConst.CALLBACK_OPEN, 0, EUExCallback.F_C_JSON, result);
+                if (null != openFuncId) {
+                    callbackToJs(Integer.parseInt(openFuncId), false, EUExCallback.F_C_SUCCESS, jobj);
+                } else {
+                    jsCallback(JsConst.CALLBACK_OPEN, 0, EUExCallback.F_C_JSON, result);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

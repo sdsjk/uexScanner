@@ -7,40 +7,9 @@
 
     <application
         android:name="org.zywx.wbpalmstar.widgetone.WidgetOneApplication"
-        android:allowClearUserData="false"
-        android:hardwareAccelerated="false"
         android:icon="@drawable/icon"
-        android:label="@string/app_name" >
-        <activity
-            android:name="org.zywx.wbpalmstar.engine.EBrowserActivity"
-            android:alwaysRetainTaskState="true"
-            android:configChanges="keyboardHidden|orientation"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:theme="@style/browser_main_theme"
-            android:windowSoftInputMode="stateHidden|adjustPan" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="appcanscheme" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="org.zywx.wbpalmstar.platform.mam.PolicyActivity"
-            android:configChanges="orientation|keyboardHidden|navigation"
-            android:windowSoftInputMode="adjustPan" />
-        <activity
-            android:name="org.zywx.wbpalmstar.platform.mam.PolicyInfoActivity"
-            android:configChanges="orientation|keyboardHidden|navigation"
-            android:windowSoftInputMode="adjustPan" />
-        <activity
-            android:name="org.zywx.wbpalmstar.engine.TempActivity"
-            android:launchMode="standard"
-            android:screenOrientation="portrait"
-            android:theme="@style/browser_loading_theme" />
+        android:label="@string/app_name"
+         >
         <activity
             android:name="org.zywx.wbpalmstar.engine.LoadingActivity"
             android:configChanges="keyboardHidden|orientation"
@@ -53,13 +22,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <receiver android:name="org.zywx.wbpalmstar.platform.push.PushRecieveMsgReceiver" >
-            <intent-filter>
-                <action android:name="org.zywx.push.receive" />
-            </intent-filter>
-        </receiver>
-
         <!-- uexScanner -->
         <activity
             android:name="com.google.zxing.client.android.CaptureActivity"
