@@ -89,7 +89,7 @@ public class EUExScanner extends EUExBase {
     }
 
     public void open(String[] params) {
-        if (params != null && params.length ==1) {
+        if (params != null && params.length == 1) {
             openFuncId = params[0];
         }
         mSupportCamera = isCameraCanUse();
@@ -116,6 +116,7 @@ public class EUExScanner extends EUExBase {
         dataJson = null;
 
     }
+
     public String recognizeFromImage(String params[]) {
         final String str = params[0];
         if (TextUtils.isEmpty(str)) {
@@ -169,7 +170,6 @@ public class EUExScanner extends EUExBase {
 
             hints.put(DecodeHintType.POSSIBLE_FORMATS, decodeFormats);
 
-
             multiFormatReader.setHints(hints);
             Result rawResult = null;
             try {
@@ -183,9 +183,6 @@ public class EUExScanner extends EUExBase {
         }
         return null;
     }
-
-
-
 
     public static boolean isCameraCanUse() {
         boolean canUse = true;
@@ -205,7 +202,6 @@ public class EUExScanner extends EUExBase {
         return canUse;
     }
 
-
     @SuppressWarnings("unused")
     private void callBackPluginJs(String methodName, String jsonData) {
         String js = SCRIPT_HEADER + "if(" + methodName + "){" + methodName + "('" + jsonData + "');}";
@@ -217,7 +213,8 @@ public class EUExScanner extends EUExBase {
         if (resultCode == Activity.RESULT_OK) {
             try {
                 JSONObject jobj = new JSONObject();
-                jobj.put(EUExCallback.F_JK_CODE, data.getStringExtra(EUExCallback.F_JK_CODE));
+                jobj.put(EUExCallback.F_JK_CODE,
+                        data.getStringExtra(EUExCallback.F_JK_CODE).replace("\"", "\\\""));
                 jobj.put(EUExCallback.F_JK_TYPE, data.getStringExtra(EUExCallback.F_JK_TYPE));
                 String result = jobj.toString();
                 if (null != openFuncId) {
