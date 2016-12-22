@@ -170,7 +170,6 @@ public class EUExScanner extends EUExBase {
 
             hints.put(DecodeHintType.POSSIBLE_FORMATS, decodeFormats);
 
-
             multiFormatReader.setHints(hints);
             Result rawResult = null;
             try {
@@ -184,7 +183,6 @@ public class EUExScanner extends EUExBase {
         }
         return null;
     }
-
 
     public static boolean isCameraCanUse() {
         boolean canUse = true;
@@ -203,7 +201,6 @@ public class EUExScanner extends EUExBase {
 
         return canUse;
     }
-
 
     @SuppressWarnings("unused")
     private void callBackPluginJs(String methodName, String jsonData) {
