@@ -1,29 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <uexplugins>
     <plugin
-        uexName="uexScanner" version="3.0.22" build="22">
-        <info>22:新增图像识别接口</info>
-        <build>21:优化扫描速度，解决图像变形问题</build>
-        <build>20:修复初始化相机抛出异常，导致应用崩溃的问题。</build>
-        <build>19:修复了某些手机上（小米note）上扫描线drawable固定宽度为0导致的应用程序崩溃</build>
-        <build>18:修复了在魅族MX5等手机在不允许camera权限时会挂掉的问题</build>
-        <build>17:修复了当扫描线高度过小时，获取View的高度小于等于0造成的程序崩溃问题</build>
-        <build>16:添加是否显示从相册选择按钮配置开关</build>
-        <build>15:添加charset字段设置编码</build>
-        <build>14:调整扫描框为正方形</build>
-        <build>13:拍照权限被禁止情况处理</build>
-        <build>12:去掉读取联系人权限</build>
-        <build>11:添加扫描本地二维码图片功能</build>
-        <build>10:二维码优化</build>
-        <build>9:优化UI效果</build>
-        <build>8:ZBar更新UI,增加setJsonData接口</build>
-        <build>7:修复uexScanner扫码画面颠倒问题</build>
-        <build>6:修复插件包打包错误问题</build>
-        <build>5:优化扫描界面</build>
-        <build>4:CreateBarCode不能调用问题</build>
-        <build>3:新增生成条形码和二维码接口</build>
-        <build>2:修复手动输入条形码崩溃问题</build>
-        <build>1:修复资源问题</build>
+        uexName="uexScanner" version="4.0.0" build="2">
+        <info>2:新增图像识别接口</info>
+        <build>1:优化扫描速度，解决图像变形问题</build>
         <build>0:条形码二维码扫描功能插件</build>
     </plugin>
 </uexplugins>

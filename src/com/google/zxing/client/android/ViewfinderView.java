@@ -41,6 +41,16 @@ import org.zywx.wbpalmstar.plugin.uexzxing.DataJsonVO;
 import java.util.Collection;
 import java.util.HashSet;
 
+import com.ace.zxing.ResultPoint;
+import com.google.zxing.client.android.camera.CameraManager;
+
+import org.zywx.wbpalmstar.base.BUtility;
+import org.zywx.wbpalmstar.engine.universalex.EUExUtil;
+import org.zywx.wbpalmstar.plugin.uexzxing.DataJsonVO;
+
+import java.util.Collection;
+import java.util.HashSet;
+
 /**
  * This view is overlaid on top of the camera preview. It adds the viewfinder
  * rectangle and partial transparency outside it, as well as the laser scanner

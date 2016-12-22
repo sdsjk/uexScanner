@@ -1,84 +1,41 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-
-    <meta name="viewport"
-          content="target-densitydpi=device-dpi, width=device-width, initial-scale=1.0, user-scalable=no"/>
-    <link rel="stylesheet" type="text/css" href="css/index.css">
-
-    <link rel="stylesheet" href="css/ui-base.css">
-    <link rel="stylesheet" href="css/ui-box.css">
-    <link rel="stylesheet" href="css/ui-color.css">
-    <link rel="stylesheet" href="css/ui-res.css">
-    <link rel="stylesheet" href="css/ui-btn.css">
-    <link rel="stylesheet" href="css/index.css">
-    <style>
-        input[type="text"] {
-        margin: .8em;
-        font-size: 1em;
-        }
-    </style>
-    <script src="js/zy_control.js">
-    </script>
-    <script src="js/zy_click.js">
-    </script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <title>获取当前位置</title>
     <script type="text/javascript">
-    function ScannerSuccessCallBack(opCode, dataType, data) {
-        alert("opCode:"+opCode+" data: "+data);
-    }
-    function ScannerFailedCallBack(data){
-        alert(data);
-    }
+        var callback = function(data) {
+            var result = "data:" + JSON.stringify(data)
+            console.log(result);
+            alert(result);
+        };
 
-    function openWithData() {
-        //var data = {
-        //    lineImg:"res://scanner_scanning.png",
-        //    pickBgImg:"res://scan_scanbg.png",
-        //    tipLabel:"请耐心等待，一定会扫描成功的",
-        //    isGallery:"0"
-        //};
-        //uexScanner.setJsonData(JSON.stringify(data));
-      	var jsonData = {
-             "lineImg":"res://line.png",
-             "pickBgImg":"res://pick_bg.png",
-             "tipLabel":"对准二维码/条形码,即可自动扫描",
-             "charset":"gbk"
-             };
-        uexScanner.setJsonData(JSON.stringify(jsonData));
-        uexScanner.open('ZXing');
-    }
-
-    window.uexOnload = function(){
-        uexScanner.cbOpen = ScannerSuccessCallBack;
-        uexWidgetOne.cbError = ScannerFailedCallBack;
-        uexScanner.cbRecognize = function(data) {
-            alert('data:' + data);
+        function scannerOpen() {
+            uexScanner.open(callback);
         }
-    }
-    function recognize() {
-        var result = uexScanner.recognizeFromImage('res://test.png');
-        alert(result);
-    }
 
-
+        function setJsonData() {
+            var jsonData = {
+                "lineImg":"res://line.png",
+                "pickBgImg":"res://pick_bg.png",
+                "tipLabel":"对准二维码/条形码,即可自动扫描",
+                "charset":"gbk"
+            };
+            uexScanner.setJsonData(JSON.stringify(jsonData));
+            uexScanner.open(callback);
+        }
     </script>
 </head>
-<body class="um-vp " ontouchstart>
+<body>
 <div class="conbor">
     <div class="consj">
-        <span>1.打开二维码扫描</span>
-        <input class="btn" type="button"
-               value="打开二维码扫描" onclick="uexScanner.open('ZXing');">
-        <input
-                class="btn" type="button" value="setJsonData" onclick=openWithData()>
-        <input
-                class="btn" type="button" value="setJsonData" onclick=recognize()>
+        <span>1.打开Scanner：</span>
+        <input class="btn" type="button" value="open" onclick="scannerOpen()" />
+        <span>2.setJsonData</span>
+        <input class="btn" type="button" value="setJsonData" onclick="setJsonData();" />
     </div>
-    <br>
 </div>
 </body>
-<script>
-
-</script>
 </html>
