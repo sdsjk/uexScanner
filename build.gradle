@@ -33,4 +33,11 @@ android {
         debug.setRoot('build-types/debug')
         release.setRoot('build-types/release')
     }
+
+    defaultConfig {
+        minSdkVersion 14
+        applicationId 'org.zywx.wbpalmstar.widgetone.uexScanner'
+        multiDexEnabled true
+    }
 }
+apply from: "https://raw.githubusercontent.com/android-plugin/gradle-plugin/master/buildPlugin.gradle"
