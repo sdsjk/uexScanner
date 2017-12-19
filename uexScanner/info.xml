@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <uexplugins>
     <plugin
-        uexName="uexScanner" version="4.0.3" build="3">
-        <info>3:修复扫描返回json时，网页无法解析的问题</info>
+        uexName="uexScanner" version="4.0.4" build="4">
+        <info>4:修正图片识别接口在主线程进行网络请求的问题</info>
+        <build>3:修复扫描返回json时，网页无法解析的问题</build>
         <build>2:新增图像识别接口</build>
         <build>1:优化扫描速度，解决图像变形问题</build>
         <build>0:条形码二维码扫描功能插件</build>

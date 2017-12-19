@@ -122,10 +122,18 @@ public class EUExScanner extends EUExBase {
         if (TextUtils.isEmpty(str)) {
             return null;
         }
-
-        Bitmap picBitmap = getPicBitmap(str);
-        String result = recognizeFromBitmap(picBitmap);
-        return result;
+        final String callbackId = params[1];
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Bitmap picBitmap = getPicBitmap(str);
+                String result = recognizeFromBitmap(picBitmap);
+                if (null != callbackId) {
+                    callbackToJs(Integer.parseInt(callbackId), false, result);
+                }
+            }
+        }).start();
+        return null;
     }
 
     private Bitmap getPicBitmap(String path) {
