@@ -20,6 +20,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -184,6 +185,9 @@ public final class ViewfinderView extends View {
 			Bitmap scanBm = drawableToBitmap(w, scanH, scanD);
 			canvas.drawBitmap(scanBm, frame.left, slideTop - MIDDLE_LINE_WIDTH / 2, paint);
 
+//			Drawable light=getLightImg();
+//			Bitmap bitmap=drawableToBitmap(96,96,light);
+//			canvas.drawBitmap(bitmap,frame.left+w/2-48, frame.bottom / 2+h/2, paint);
 			// 画扫描框下面的字
 			paint.setColor(Color.WHITE);
 			paint.setTextSize(TEXT_SIZE * density);
@@ -216,6 +220,8 @@ public final class ViewfinderView extends View {
 
 		}
 	}
+
+
 
 	public void drawViewfinder() {
 		resultBitmap = null;
@@ -263,6 +269,19 @@ public final class ViewfinderView extends View {
 	}
 
 	@SuppressWarnings("deprecation")
+	private Drawable getLightImg() {
+		Drawable lineImg;
+		if (mData.getLineImg() == null) {
+			lineImg = mContext.getResources().getDrawable(EUExUtil.getResDrawableID("plugin_scanner_light"));
+		} else {
+			Bitmap bitmap = BUtility.getLocalImg(mContext, mData.getLineImg());
+			lineImg = new BitmapDrawable(bitmap);
+		}
+		return lineImg;
+	}
+
+
+	@SuppressWarnings("deprecation")
 	private Drawable getPickBgImg() {
 		Drawable pickBgImg;
 		if (mData.getLineImg() == null) {
@@ -281,4 +300,8 @@ public final class ViewfinderView extends View {
 		}
 		return tip;
 	}
+
+
+
+
 }

@@ -19,13 +19,19 @@ package com.google.zxing.client.android;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -40,8 +46,10 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ace.zxing.BarcodeFormat;
 import com.ace.zxing.BinaryBitmap;
@@ -58,7 +66,6 @@ import org.json.JSONObject;
 import org.zywx.wbpalmstar.engine.universalex.EUExCallback;
 import org.zywx.wbpalmstar.engine.universalex.EUExUtil;
 import org.zywx.wbpalmstar.plugin.uexscanner.JsConst;
-import org.zywx.wbpalmstar.plugin.uexscanner.utils.MLog;
 import org.zywx.wbpalmstar.plugin.uexzxing.DataJsonVO;
 import org.zywx.wbpalmstar.plugin.uexzxing.ScannerUtils;
 import org.zywx.wbpalmstar.plugin.uexzxing.ViewToolView;
@@ -79,7 +86,7 @@ import java.util.Vector;
  * @author dswitkin@google.com (Daniel Switkin)
  * @author Sean Owen
  */
-public final class CaptureActivity extends Activity implements SurfaceHolder.Callback {
+public final class CaptureActivity extends Activity implements SurfaceHolder.Callback, SensorEventListener {
 
 	private static final String TAG = CaptureActivity.class.getSimpleName();
 	private CameraManager cameraManager;
@@ -98,7 +105,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	private ImageView mGalleryPic;
 	private TextView mFailText;
 	private ScanPicHandler mHandler;
-
+	private TextView plugin_uexscanner_light;
+	private Sensor sensor_light;
+	private   SensorManager manager;
 	ViewfinderView getViewfinderView() {
 		return viewfinderView;
 	}
@@ -127,7 +136,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 				mData = new DataJsonVO();
 			}
 		}
-
+		manager= (SensorManager) getSystemService(SENSOR_SERVICE);
+		sensor_light= manager.getDefaultSensor(Sensor.TYPE_LIGHT);
+//		LightSensorManager.getInstance().start(this);
 		hasSurface = false;
 		inactivityTimer = new InactivityTimer(this);
 		ambientLightManager = new AmbientLightManager(this);
@@ -136,21 +147,50 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		mHandler = new ScanPicHandler(Looper.getMainLooper());
 	}
 
+	private int dp2px(Context context,float dpValue){
+		float scale=context.getResources().getDisplayMetrics().density;
+		return (int)(dpValue*scale+0.5f);
+	}
+
 	private void initConView() {
+		//头部
 		mToolView = new ViewToolView(this, mData, toolListener);
-		RelativeLayout.LayoutParams toolParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		RelativeLayout.LayoutParams toolParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, dp2px(this,60));
 		int top = (int) getResources().getDimension(EUExUtil.getResDimenID("plugin_uexscanner_tool_top"));
 		int left = (int) getResources().getDimension(EUExUtil.getResDimenID("plugin_uexscanner_tool_left"));
-		toolParams.setMargins(left, top, left, 0);
+//		toolParams.setMargins(left, top, left, 0);
 		mToolView.setId(1);
 		mToolView.setLayoutParams(toolParams);
 		mConRel.addView(mToolView);
 
+//		中间扫描部分
 		viewfinderView = new ViewfinderView(this, mData);
 		RelativeLayout.LayoutParams viewParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 		viewParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 		viewfinderView.setLayoutParams(viewParams);
 		mConRel.addView(viewfinderView);
+//		开启闪光灯部分
+		plugin_uexscanner_light= (TextView) mConRel.findViewById(EUExUtil.getResIdID("plugin_uexscanner_light"));
+		plugin_uexscanner_light.setOnClickListener(new View.OnClickListener() {
+			boolean on;
+			@Override
+			public void onClick(View v) {
+				CameraManager cmg = CameraManager.getInstance(CaptureActivity.this);
+				if (!cmg.suportFlashlight()) {
+					Toast.makeText(CaptureActivity.this, EUExUtil.getResStringID("plugin_uexscanner_not_support_flash"), Toast.LENGTH_SHORT).show();
+					return;
+				}
+				if (on) {
+					cmg.setTorch(false);
+					on = false;
+					plugin_uexscanner_light.setText("打开手电筒");
+				} else {
+					cmg.setTorch(true);
+					on = true;
+					plugin_uexscanner_light.setText("关闭手电筒");
+				}
+			}
+		});
 
 		mGalleryPic = new ImageView(this);
 		RelativeLayout.LayoutParams picParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
@@ -179,8 +219,49 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 				mGalleryPic.setVisibility(View.GONE);
 			}
 		});
+//		底部菜单选择
+		LinearLayout plugin_scanner_bottom= (LinearLayout) mConRel.findViewById(EUExUtil.getResIdID("plugin_scanner_bottom"));
+		plugin_scanner_bottom.setAlpha(0.6f);
+		plugin_scanner_bottom.getChildAt(0).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Toast.makeText(CaptureActivity.this,"二维码",Toast.LENGTH_LONG).show();
+			}
+		});
+		plugin_scanner_bottom.getChildAt(1).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Toast.makeText(CaptureActivity.this,"安全码",Toast.LENGTH_LONG).show();
+			}
+		});
+	}
+
+	@Override
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
 	}
+
+	@Override
+	public void onSensorChanged(SensorEvent event) {
+		float[] values= event.values;//获取传感器的当前值
+		switch (event.sensor.getType()){//根据事件返回的传感器类型的常量值处理事件
+			case Sensor.TYPE_LIGHT:
+				if(values[0]<60.0) {
+						if(!plugin_uexscanner_light.isShown()){
+							plugin_uexscanner_light.setVisibility(View.VISIBLE);
+						}
+				}else {
+					if(plugin_uexscanner_light.isShown()){
+						plugin_uexscanner_light.setVisibility(View.GONE);
+					}
+				}
+				break;
+			default:
+				break;
+
+		}
+	}
+
 
 	public class ScanPicHandler extends Handler {
 
@@ -208,6 +289,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	protected void onResume() {
 		super.onResume();
 		Log.i("djf", "onResume");
+		manager.registerListener(this,sensor_light,SensorManager.SENSOR_DELAY_NORMAL);
 		// CameraManager must be initialized here, not in onCreate(). This is
 		// necessary because we don't
 		// want to open the camera driver and measure the screen size if we're
@@ -285,6 +367,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 				surfaceHolder.removeCallback(this);
 			}
 		}
+		manager.unregisterListener(this);
 		super.onPause();
 	}
 
@@ -465,6 +548,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		}
 	}
 
+
+
 	private class ScanLocalImageAsyncTask extends AsyncTask<Object, Object, Integer> {
 
 		private Uri uri;
@@ -541,4 +626,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 			}
 		}
 	}
+
+
 }

@@ -256,6 +256,7 @@ public final class CameraManager {
 			;
 			int h = w;
 
+
 			viewWidth = w;
 			viewHeight = h;
 			int leftOffset = (screenResolution.x - w) / 2;

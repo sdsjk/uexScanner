@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.zxing.client.android.CaptureActivity;
@@ -21,8 +22,10 @@ import org.zywx.wbpalmstar.plugin.uexscanner.JsConst;
 public class ViewToolView extends RelativeLayout {
 
 	private ImageButton mBtnCancel;
-	private ImageView mBtnLight;
-	private ImageView mGallery;
+//	private ImageView mBtnLight;
+	private TextView mBtnLight;
+//	private ImageView mGallery;
+	private TextView mGallery;
 	private Context mContext;
 	private DataJsonVO mData;
 	private CaptureActivity.ToolListener mListener;
@@ -38,15 +41,25 @@ public class ViewToolView extends RelativeLayout {
 	@SuppressWarnings("deprecation")
 	private void init() {
 		setBackgroundResource(Color.TRANSPARENT);
-		mGallery = new ImageView(mContext);
+		setBackgroundColor(Color.BLACK);
+		setAlpha(0.6f);
+
+		mGallery = new TextView(mContext);
 		mGallery.setClickable(true);
-		Drawable scan_gallery_on = mContext.getResources().getDrawable(EUExUtil.getResDrawableID("plugin_scanner_gallery_pressed"));
-		Drawable scan_gallery_off = mContext.getResources().getDrawable(EUExUtil.getResDrawableID("plugin_scanner_gallery_normal"));
-		StateListDrawable gallery_style = new StateListDrawable();
-		gallery_style.addState(new int[] { android.R.attr.state_pressed, android.R.attr.state_enabled }, scan_gallery_on);
-		gallery_style.addState(new int[] { android.R.attr.state_enabled, android.R.attr.state_focused }, scan_gallery_on);
-		gallery_style.addState(new int[] { android.R.attr.state_enabled }, scan_gallery_off);
-		mGallery.setBackgroundDrawable(gallery_style);
+//		Drawable scan_gallery_on = mContext.getResources().getDrawable(EUExUtil.getResDrawableID("plugin_scanner_gallery_pressed"));
+//		Drawable scan_gallery_off = mContext.getResources().getDrawable(EUExUtil.getResDrawableID("plugin_scanner_gallery_normal"));
+//		StateListDrawable gallery_style = new StateListDrawable();
+//		gallery_style.addState(new int[] { android.R.attr.state_pressed, android.R.attr.state_enabled }, scan_gallery_on);
+//		gallery_style.addState(new int[] { android.R.attr.state_enabled, android.R.attr.state_focused }, scan_gallery_on);
+//		gallery_style.addState(new int[] { android.R.attr.state_enabled }, scan_gallery_off);
+//		mGallery.setBackgroundDrawable(gallery_style);
+		mGallery.setText("相册");
+		mGallery.setTextSize(20);
+		mGallery.setPadding(0,0,25,0);
+		mGallery.setTextColor(Color.WHITE);
+
+
+
 
 		// by waka 是否显示从相册选择的开关
 		String isGallery = mData.getIsGallery();
@@ -56,15 +69,18 @@ public class ViewToolView extends RelativeLayout {
 			}
 		}
 
-		mBtnLight = new ImageView(mContext);
-		mBtnLight.setClickable(true);
-		Drawable scan_light_on = mContext.getResources().getDrawable(EUExUtil.getResDrawableID("plugin_scanner_light_pressed"));
-		Drawable scan_light_off = mContext.getResources().getDrawable(EUExUtil.getResDrawableID("plugin_scanner_light_normal"));
-		StateListDrawable light_style = new StateListDrawable();
-		light_style.addState(new int[] { android.R.attr.state_pressed, android.R.attr.state_enabled }, scan_light_on);
-		light_style.addState(new int[] { android.R.attr.state_enabled, android.R.attr.state_focused }, scan_light_on);
-		light_style.addState(new int[] { android.R.attr.state_enabled }, scan_light_off);
-		mBtnLight.setBackgroundDrawable(light_style);
+		mBtnLight = new TextView(mContext);
+		mBtnLight.setText("扫一扫");
+		mBtnLight.setTextSize(20);
+		mBtnLight.setTextColor(Color.WHITE);
+//		mBtnLight.setClickable(true);
+//		Drawable scan_light_on = mContext.getResources().getDrawable(EUExUtil.getResDrawableID("plugin_scanner_light_pressed"));
+//		Drawable scan_light_off = mContext.getResources().getDrawable(EUExUtil.getResDrawableID("plugin_scanner_light_normal"));
+//		StateListDrawable light_style = new StateListDrawable();
+//		light_style.addState(new int[] { android.R.attr.state_pressed, android.R.attr.state_enabled }, scan_light_on);
+//		light_style.addState(new int[] { android.R.attr.state_enabled, android.R.attr.state_focused }, scan_light_on);
+//		light_style.addState(new int[] { android.R.attr.state_enabled }, scan_light_off);
+//		mBtnLight.setBackgroundDrawable(light_style);
 
 		mBtnCancel = new ImageButton(mContext);
 		mBtnCancel.setClickable(true);
@@ -83,9 +99,11 @@ public class ViewToolView extends RelativeLayout {
 
 		LayoutParams parml = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 		parml.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+		parml.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
 		mGallery.setLayoutParams(parml);
 
 		LayoutParams parmc = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		parmc.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
 		mBtnCancel.setLayoutParams(parmc);
 
 		addView(mGallery);
@@ -103,27 +121,27 @@ public class ViewToolView extends RelativeLayout {
 			}
 		});
 
-		mBtnLight.setOnClickListener(new OnClickListener() {
-			boolean on;
-
-			@Override
-			public void onClick(View v) {
-				CameraManager cmg = CameraManager.getInstance(mContext);
-				if (!cmg.suportFlashlight()) {
-					Toast.makeText(mContext, EUExUtil.getResStringID("plugin_uexscanner_not_support_flash"), Toast.LENGTH_SHORT).show();
-					return;
-				}
-				if (on) {
-					cmg.setTorch(false);
-					on = false;
-					mBtnLight.setBackgroundResource(EUExUtil.getResDrawableID("plugin_scanner_light_normal"));
-				} else {
-					cmg.setTorch(true);
-					mBtnLight.setBackgroundResource(EUExUtil.getResDrawableID("plugin_scanner_light_pressed"));
-					on = true;
-				}
-			}
-		});
+//		mBtnLight.setOnClickListener(new OnClickListener() {
+//			boolean on;
+//
+//			@Override
+//			public void onClick(View v) {
+//				CameraManager cmg = CameraManager.getInstance(mContext);
+//				if (!cmg.suportFlashlight()) {
+//					Toast.makeText(mContext, EUExUtil.getResStringID("plugin_uexscanner_not_support_flash"), Toast.LENGTH_SHORT).show();
+//					return;
+//				}
+//				if (on) {
+//					cmg.setTorch(false);
+//					on = false;
+//					mBtnLight.setBackgroundResource(EUExUtil.getResDrawableID("plugin_scanner_light_normal"));
+//				} else {
+//					cmg.setTorch(true);
+//					mBtnLight.setBackgroundResource(EUExUtil.getResDrawableID("plugin_scanner_light_pressed"));
+//					on = true;
+//				}
+//			}
+//		});
 		mGallery.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

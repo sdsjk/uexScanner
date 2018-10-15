@@ -12,6 +12,61 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical" >
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_centerInParent="true"
+            >
+            <TextView
+                android:id="@+id/plugin_uexscanner_light"
+                android:clickable="true"
+                android:drawableTop="@drawable/plugin_scanner_light"
+                android:drawablePadding="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#ffffff"
+                android:textSize="18sp"
+                android:padding="10dp"
+                android:text="打开手电筒"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/plugin_scanner_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:background="#000000"
+            >
+            <RadioButton
+                android:padding="10dp"
+                android:button="@null"
+                android:id="@+id/plugin_scanner_ewm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableTop="@drawable/plugin_scanner_erweima_select"
+                android:text="二维码"
+                android:layout_weight="1"
+                android:drawablePadding="10dp"
+                android:gravity="center"
+                />
+            <RadioButton
+                android:button="@null"
+                android:padding="10dp"
+                android:id="@+id/plugin_scanner_safe"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableTop="@drawable/plugin_scanner_safe_select"
+                android:text="安全码"
+                android:drawablePadding="10dp"
+                android:gravity="center"
+                android:layout_weight="1"
+                />
+        </LinearLayout>
+
     </RelativeLayout>
 
 </merge>
