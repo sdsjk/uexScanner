@@ -1,11 +1,17 @@
 package org.zywx.wbpalmstar.plugin.uexscanner;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
+import android.os.Bundle;
 import android.os.Environment;
+import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -27,6 +33,7 @@ import com.google.zxing.client.android.Intents;
 import org.json.JSONObject;
 import org.zywx.wbpalmstar.base.BUtility;
 import org.zywx.wbpalmstar.engine.DataHelper;
+import org.zywx.wbpalmstar.engine.EBrowserActivity;
 import org.zywx.wbpalmstar.engine.EBrowserView;
 import org.zywx.wbpalmstar.engine.universalex.EUExBase;
 import org.zywx.wbpalmstar.engine.universalex.EUExCallback;
@@ -50,6 +57,7 @@ public class EUExScanner extends EUExBase {
 
     public boolean mSupportCamera = false;
     private String openFuncId;
+    private String[] openParams;
 
     public EUExScanner(Context context, EBrowserView view) {
         super(context, view);
@@ -89,31 +97,39 @@ public class EUExScanner extends EUExBase {
     }
 
     public void open(String[] params) {
-        if (params != null && params.length == 1) {
-            openFuncId = params[0];
-        }
-        mSupportCamera = isCameraCanUse();
-
-        if (!mSupportCamera) {
-            if (null != openFuncId) {
-                callbackToJs(Integer.parseInt(openFuncId), false, EUExCallback.F_C_FAILED);
-            } else {
-                jsCallback(JsConst.CALLBACK_OPEN, 1, EUExCallback.F_C_JSON, "");
+        openParams = params;
+        // android6.0以上动态权限申请
+        if (mContext.checkCallingOrSelfPermission(Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED){
+            requsetPerssions(Manifest.permission.CAMERA, "请先申请权限"
+                    + Manifest.permission.CAMERA, 1);
+        } else {
+            if (params != null && params.length == 1) {
+                openFuncId = params[0];
             }
-            return;
+            mSupportCamera = isCameraCanUse();
+
+            if (!mSupportCamera) {
+                if (null != openFuncId) {
+                    callbackToJs(Integer.parseInt(openFuncId), false, EUExCallback.F_C_FAILED);
+                } else {
+                    jsCallback(JsConst.CALLBACK_OPEN, 1, EUExCallback.F_C_JSON, "");
+                }
+                return;
+            }
+            Intent intent = new Intent();
+            intent.setAction(Intents.Scan.ACTION);
+            if (dataJson != null && dataJson.getCharset() != null) {
+                intent.putExtra(Intents.Scan.CHARACTER_SET, dataJson.getCharset());
+            }
+            intent.putExtra(Intents.Scan.MODE, Intents.Scan.QR_CODE_MODE);
+            intent.setClass(mContext, CaptureActivity.class);
+            if (dataJson != null) {
+                intent.putExtra(JsConst.DATA_JSON, dataJson);
+            }
+            startActivityForResult(intent, 55555);
+            dataJson = null;
         }
-        Intent intent = new Intent();
-        intent.setAction(Intents.Scan.ACTION);
-        if (dataJson != null && dataJson.getCharset() != null) {
-            intent.putExtra(Intents.Scan.CHARACTER_SET, dataJson.getCharset());
-        }
-        intent.putExtra(Intents.Scan.MODE, Intents.Scan.QR_CODE_MODE);
-        intent.setClass(mContext, CaptureActivity.class);
-        if (dataJson != null) {
-            intent.putExtra(JsConst.DATA_JSON, dataJson);
-        }
-        startActivityForResult(intent, 55555);
-        dataJson = null;
 
     }
 
@@ -232,6 +248,51 @@ public class EUExScanner extends EUExBase {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionResult(requestCode, permissions, grantResults);
+        if (requestCode == 1){
+            if (grantResults[0] != PackageManager.PERMISSION_DENIED){
+                if (openParams != null && openParams.length == 1) {
+                    openFuncId = openParams[0];
+                }
+                mSupportCamera = isCameraCanUse();
+
+                if (!mSupportCamera) {
+                    if (null != openFuncId) {
+                        callbackToJs(Integer.parseInt(openFuncId), false, EUExCallback.F_C_FAILED);
+                    } else {
+                        jsCallback(JsConst.CALLBACK_OPEN, 1, EUExCallback.F_C_JSON, "");
+                    }
+                    return;
+                }
+                Intent intent = new Intent();
+                intent.setAction(Intents.Scan.ACTION);
+                if (dataJson != null && dataJson.getCharset() != null) {
+                    intent.putExtra(Intents.Scan.CHARACTER_SET, dataJson.getCharset());
+                }
+                intent.putExtra(Intents.Scan.MODE, Intents.Scan.QR_CODE_MODE);
+                intent.setClass(mContext, CaptureActivity.class);
+                if (dataJson != null) {
+                    intent.putExtra(JsConst.DATA_JSON, dataJson);
+                }
+                startActivityForResult(intent, 55555);
+                dataJson = null;
+            } else {
+                // 对于 ActivityCompat.shouldShowRequestPermissionRationale
+                // 1：用户拒绝了该权限，没有勾选"不再提醒"，此方法将返回true。
+                // 2：用户拒绝了该权限，有勾选"不再提醒"，此方法将返回 false。
+                // 3：如果用户同意了权限，此方法返回false
+                // 拒绝了权限且勾选了"不再提醒"
+                if (!ActivityCompat.shouldShowRequestPermissionRationale((EBrowserActivity)mContext, permissions[0])) {
+                    Toast.makeText(mContext, "请先设置权限" + permissions[0], Toast.LENGTH_LONG).show();
+                } else {
+                    requsetPerssions(Manifest.permission.CAMERA, "请先申请权限" + permissions[0], 1);
+                }
             }
         }
     }
