@@ -434,12 +434,17 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 	}
 
 	private void displayFrameworkBugMessageAndExit() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(EUExUtil.getResStringID("app_name")));
-		builder.setMessage(getString(EUExUtil.getResStringID("plugin_uexscanner_msg_camera_framework_bug")));
-		builder.setPositiveButton(EUExUtil.getResStringID("confirm"), new FinishListener(this));
-		builder.setOnCancelListener(new FinishListener(this));
-		builder.show();
+		try {
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle(getString(EUExUtil.getResStringID("app_name")));
+			builder.setMessage(getString(EUExUtil.getResStringID("plugin_uexscanner_msg_camera_framework_bug")));
+			builder.setPositiveButton(EUExUtil.getResStringID("confirm"), new FinishListener(this));
+			builder.setOnCancelListener(new FinishListener(this));
+			builder.show();
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+
 	}
 
 	private void resetStatusView() {
